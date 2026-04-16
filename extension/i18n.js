@@ -65,8 +65,10 @@ const translations = {
     'banner.dupeText':  (n) => `你有 ${n} 个 Tab Out 标签页打开。只保留这一个？`,
 
     // Empty states
-    'empty.saved':     '没有保存的内容，活在当下。',
-    'empty.archive':   '无结果',
+    'empty.saved':           '没有保存的内容，活在当下。',
+    'empty.archive':         '无结果',
+    'empty.inboxZeroTitle':   '标签页清零，收工。',
+    'empty.inboxZeroSubtitle':'自由了。',
 
     // History page
     'history.title':       'History',
@@ -150,8 +152,10 @@ const translations = {
     'banner.dupeText':  (n) => `You have ${n} Tab Out tabs open. Keep just this one?`,
 
     // Empty states
-    'empty.saved':     'Nothing saved. Living in the moment.',
-    'empty.archive':   'No results',
+    'empty.saved':           'Nothing saved. Living in the moment.',
+    'empty.archive':         'No results',
+    'empty.inboxZeroTitle':   'Inbox zero, but for tabs.',
+    'empty.inboxZeroSubtitle':"You're free.",
 
     // History page
     'history.title':       'History',
