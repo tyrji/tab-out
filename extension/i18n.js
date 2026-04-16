@@ -26,7 +26,7 @@ const translations = {
     'section.browser':   '浏览器',
 
     // Popup
-    'popup.archiveAll':  '归档为一个 Tab',
+    'popup.archiveAll':  '归档为 1 个标签页',
     'popup.viewSaved':   '查看已归档',
     'popup.done':        '完成！',
     'popup.noTabs':      '没有标签页',

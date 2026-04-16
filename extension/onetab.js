@@ -215,6 +215,24 @@ async function renderOneTab(filter = '') {
    ---------------------------------------------------------------- */
 
 document.addEventListener('click', async (e) => {
+  // ---- Open a link and remove it from the list ----
+  const link = e.target.closest('.onetab-item-title');
+  if (link) {
+    const item = link.closest('.onetab-item');
+    const id = item?.dataset.onetabId;
+    if (id) {
+      const { onetab = [] } = await chrome.storage.local.get('onetab');
+      await chrome.storage.local.set({ onetab: onetab.filter(i => i.id !== id) });
+      if (item) {
+        item.style.transition = 'opacity 0.2s, transform 0.2s';
+        item.style.opacity = '0';
+        item.style.transform = 'translateX(20px)';
+        setTimeout(() => renderOneTab(document.getElementById('onetabSearch')?.value.trim()), 200);
+      }
+    }
+    return;
+  }
+
   const actionEl = e.target.closest('[data-action]');
   if (!actionEl) return;
 
