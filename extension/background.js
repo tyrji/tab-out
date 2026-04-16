@@ -17,7 +17,6 @@
  * addToHistory(tab)
  *
  * Records a closed tab to the history list in chrome.storage.local.
- * Silently prunes oldest 10% when total exceeds 10000 records.
  */
 async function addToHistory(tab) {
   if (!tab || !tab.url) return;
@@ -53,11 +52,6 @@ async function addToHistory(tab) {
     if (isDuplicate) return;
 
     history.push(entry);
-
-    // Prune oldest 10% when over 10000
-    if (history.length > 10000) {
-      history.splice(0, Math.floor(history.length * 0.1));
-    }
 
     await chrome.storage.local.set({ history });
   } catch {}

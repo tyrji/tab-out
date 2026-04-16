@@ -319,10 +319,6 @@ async function recordHistory(tabs, source = 'close') {
         source:   tab.source || source,
       });
     }
-    // Prune oldest 10% when over 10000
-    if (history.length > 10000) {
-      history.splice(0, Math.floor(history.length * 0.1));
-    }
     await chrome.storage.local.set({ history });
   } catch {}
 }
