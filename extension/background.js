@@ -4,58 +4,11 @@
  * Chrome's "always-on" background script for Tab Out.
  * Its only job: keep the toolbar badge showing the current open tab count.
  *
- * Since we no longer have a server, we query chrome.tabs directly.
- * The badge counts real web tabs (skipping chrome:// and extension pages).
- *
  * Color coding gives a quick at-a-glance health signal:
  *   Green  (#3d7a4a) → 1–10 tabs  (focused, manageable)
  *   Amber  (#b8892e) → 11–20 tabs (getting busy)
  *   Red    (#b35a5a) → 21+ tabs   (time to cull!)
  */
-
-/**
- * addToHistory(tab)
- *
- * Records a closed tab to the history list in chrome.storage.local.
- */
-async function addToHistory(tab) {
-  if (!tab || !tab.url) return;
-
-  const url = tab.url || '';
-
-  // Skip Tab Out's own pages
-  if (url.startsWith('chrome-extension://') && url.includes(chrome.runtime.id)) return;
-
-  let domain = '';
-  try { domain = new URL(url).hostname; } catch {}
-
-  const entry = {
-    id:       Date.now().toString() + Math.random().toString(36).slice(2, 6),
-    url:      url,
-    title:    tab.title || url,
-    domain:   domain,
-    closedAt: new Date().toISOString(),
-    source:   tab.source || 'close',
-  };
-
-  try {
-    const { history = [] } = await chrome.storage.local.get('history');
-
-    // Deduplicate: skip if the same URL was recorded in the last 2 seconds
-    // (prevents double-recording when app.js writes history and then background.js
-    // also fires on chrome.tabs.remove)
-    const twoSecondsAgo = Date.now() - 2000;
-    const isDuplicate = history.some(item =>
-      item.url === url &&
-      new Date(item.closedAt).getTime() > twoSecondsAgo
-    );
-    if (isDuplicate) return;
-
-    history.push(entry);
-
-    await chrome.storage.local.set({ history });
-  } catch {}
-}
 
 // ─── Badge updater ────────────────────────────────────────────────────────────
 
@@ -121,24 +74,39 @@ chrome.tabs.onCreated.addListener(() => {
   updateBadge();
 });
 
-// Update badge whenever a tab is closed
-// Also record tab to history using cached info
-const tabCache = new Map();
-
-chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+chrome.tabs.onUpdated.addListener(() => {
   updateBadge();
-  if (changeInfo.status === 'complete' || tab.url) {
-    tabCache.set(tabId, { url: tab.url, title: tab.title });
-  }
 });
 
-chrome.tabs.onRemoved.addListener(async (tabId) => {
+chrome.tabs.onRemoved.addListener(() => {
   updateBadge();
-  const info = tabCache.get(tabId);
-  if (info) {
-    tabCache.delete(tabId);
-    info.source = 'close';
-    await addToHistory(info);
+});
+
+// ─── Handle messages from popup ────────────────────────────────────────────
+
+chrome.runtime.onMessage.addListener((msg) => {
+  if (msg.action === 'archiveTabs') {
+    (async () => {
+      const tabs = await chrome.tabs.query({});
+      if (tabs.length === 0) return;
+
+      const { onetab = [] } = await chrome.storage.local.get('onetab');
+      for (const tab of tabs) {
+        let domain = '';
+        try { domain = new URL(tab.url).hostname; } catch {}
+        onetab.push({
+          id:      Date.now().toString() + Math.random().toString(36).slice(2, 6),
+          url:     tab.url,
+          title:   tab.title || tab.url,
+          domain:  domain,
+          savedAt: new Date().toISOString(),
+        });
+      }
+      await chrome.storage.local.set({ onetab });
+
+      await chrome.tabs.create({ url: 'onetab.html' });
+      await chrome.tabs.remove(tabs.map(t => t.id));
+    })();
   }
 });
 

@@ -89,9 +89,6 @@ async function closeTabsByUrls(urls) {
       } catch { return false; }
     });
 
-  // Record to history before closing
-  await recordHistory(toClose);
-
   if (toClose.length > 0) await chrome.tabs.remove(toClose.map(t => t.id));
   await fetchOpenTabs();
 }
@@ -107,8 +104,6 @@ async function closeTabsExact(urls) {
   const urlSet = new Set(urls);
   const allTabs = await chrome.tabs.query({});
   const toClose = allTabs.filter(t => urlSet.has(t.url));
-  // Record to history before closing
-  await recordHistory(toClose);
   if (toClose.length > 0) await chrome.tabs.remove(toClose.map(t => t.id));
   await fetchOpenTabs();
 }
@@ -168,10 +163,6 @@ async function closeDuplicateTabs(urls, keepOne = true) {
       for (const tab of matching) toClose.push(tab.id);
     }
   }
-
-  // Record to history before closing
-  const toCloseTabs = allTabs.filter(t => toClose.includes(t.id));
-  await recordHistory(toCloseTabs);
 
   if (toClose.length > 0) await chrome.tabs.remove(toClose);
   await fetchOpenTabs();
@@ -245,8 +236,7 @@ async function saveTabForLater(tab) {
   });
   await chrome.storage.local.set({ deferred });
 
-  // Also record to history
-  await recordHistory([{ ...tab, source: 'save' }]);
+
 }
 
 /**
@@ -294,34 +284,6 @@ async function dismissSavedTab(id) {
   }
 }
 
-
-/* ----------------------------------------------------------------
-   HISTORY — Record closed tabs
-   ---------------------------------------------------------------- */
-
-async function recordHistory(tabs, source = 'close') {
-  if (!tabs || tabs.length === 0) return;
-  try {
-    const { history = [] } = await chrome.storage.local.get('history');
-    for (const tab of tabs) {
-      if (!tab || !tab.url) continue;
-      const url = tab.url;
-      // Skip Tab Out's own pages
-      if (url.startsWith('chrome-extension://') && url.includes(chrome.runtime.id)) continue;
-      let domain = '';
-      try { domain = new URL(url).hostname; } catch {}
-      history.push({
-        id:       Date.now().toString() + Math.random().toString(36).slice(2, 6),
-        url:      url,
-        title:    tab.title || url,
-        domain:   domain,
-        closedAt: new Date().toISOString(),
-        source:   tab.source || source,
-      });
-    }
-    await chrome.storage.local.set({ history });
-  } catch {}
-}
 
 /* ----------------------------------------------------------------
    UI HELPERS
@@ -1230,9 +1192,9 @@ async function renderStaticDashboard() {
   // --- Render "Saved for Later" column ---
   await renderDeferredColumn();
 
-  // --- Update History link text for i18n ---
-  const historyLink = document.getElementById('historyLink');
-  if (historyLink) historyLink.textContent = t('section.history');
+  // --- Update OneTab link text for i18n ---
+  const oneTabLink = document.getElementById('oneTabLink');
+  if (oneTabLink) oneTabLink.textContent = t('section.oneTab');
 }
 
 async function renderDashboard() {
@@ -1280,6 +1242,8 @@ document.addEventListener('click', async (e) => {
     return;
   }
 
+
+
   const card = actionEl.closest('.mission-card');
 
   // ---- Expand overflow chips ("+N more") ----
@@ -1305,11 +1269,9 @@ document.addEventListener('click', async (e) => {
     const tabUrl = actionEl.dataset.tabUrl;
     if (!tabUrl) return;
 
-    // Record to history before closing
     const allTabs = await chrome.tabs.query({});
     const match   = allTabs.find(t => t.url === tabUrl);
     if (match) {
-      await recordHistory([match]);
       await chrome.tabs.remove(match.id);
     }
     await fetchOpenTabs();

@@ -22,7 +22,15 @@ const translations = {
     'section.homepages': '主页',
     'section.archive':   '归档',
     'section.history':   'History',
+    'section.oneTab':    'OneTab',
     'section.browser':   '浏览器',
+
+    // Popup
+    'popup.archiveAll':  '归档为一个 Tab',
+    'popup.viewSaved':   '查看已归档',
+    'popup.done':        '完成！',
+    'popup.noTabs':      '没有标签页',
+    'popup.archiving':   '归档中…',
 
     // Footer
     'footer.openTabs': '打开的标签页',
@@ -87,6 +95,22 @@ const translations = {
     'history.cleared':     '历史记录已清空',
     'history.back':        '← 返回',
 
+    // OneTab page
+    'onetab.title':        'OneTab',
+    'onetab.search':       '搜索保存的标签页...',
+    'onetab.today':        '今天',
+    'onetab.yesterday':    '昨天',
+    'onetab.thisWeek':     '本周',
+    'onetab.monthFormat':  (year, month) => `${year}年${month}月`,
+    'onetab.dateFormat':   (month, day) => `${month}月${day}日`,
+    'onetab.clearAll':     '清空所有',
+    'onetab.total':        (n) => `共 ${n} 条`,
+    'onetab.empty':        '暂无保存的标签页。',
+    'onetab.confirmClear': '确定清空所有保存的标签页？',
+    'onetab.deleted':      '已删除',
+    'onetab.cleared':      '已清空',
+    'onetab.back':         '← 返回',
+
     // Search
     'search.archive':  '搜索归档标签页...',
 
@@ -109,7 +133,15 @@ const translations = {
     'section.homepages':  'Homepages',
     'section.archive':    'Archive',
     'section.history':    'History',
+    'section.oneTab':     'OneTab',
     'section.browser':    'Browser',
+
+    // Popup
+    'popup.archiveAll':  'Send to OneTab',
+    'popup.viewSaved':   'View saved tabs',
+    'popup.done':       'Done!',
+    'popup.noTabs':     'No tabs open',
+    'popup.archiving':  'Sending…',
 
     // Footer
     'footer.openTabs': 'Open tabs',
@@ -173,6 +205,22 @@ const translations = {
     'history.deleted':     'Deleted',
     'history.cleared':     'History cleared',
     'history.back':        '← Back',
+
+    // OneTab page
+    'onetab.title':        'OneTab',
+    'onetab.search':       'Search saved tabs...',
+    'onetab.today':        'Today',
+    'onetab.yesterday':    'Yesterday',
+    'onetab.thisWeek':     'This week',
+    'onetab.monthFormat':  (year, month) => `${year} ${month}`,
+    'onetab.dateFormat':   (month, day) => `${month} ${day}`,
+    'onetab.clearAll':     'Clear all',
+    'onetab.total':        (n) => `${n} item${n !== 1 ? 's' : ''}`,
+    'onetab.empty':        'No saved tabs yet.',
+    'onetab.confirmClear': 'Clear all saved tabs?',
+    'onetab.deleted':      'Deleted',
+    'onetab.cleared':      'Cleared',
+    'onetab.back':         '← Back',
 
     // Search
     'search.archive':  'Search archived tabs...',

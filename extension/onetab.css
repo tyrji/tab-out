@@ -1,0 +1,243 @@
+/* ================================================================
+   History Page Styles
+   Shares base design language with the main dashboard.
+   ================================================================ */
+
+/* Header layout — back button + title on left, search on right */
+header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
+.header-left {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+}
+
+.header-back {
+  padding-top: 4px;
+}
+
+.back-link {
+  font-size: 13px;
+  color: var(--muted);
+  text-decoration: none;
+  transition: color 0.15s;
+  white-space: nowrap;
+}
+
+.back-link:hover {
+  color: var(--ink);
+}
+
+.header-right {
+  flex-shrink: 0;
+  padding-top: 4px;
+}
+
+.onetab-search {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  width: 240px;
+  padding: 8px 14px;
+  border: 1px solid var(--warm-gray);
+  border-radius: 6px;
+  background: var(--card-bg);
+  color: var(--ink);
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.onetab-search:focus {
+  border-color: var(--accent-amber);
+}
+
+.onetab-search::placeholder {
+  color: var(--muted);
+}
+
+/* ---- Date group ---- */
+.onetab-group {
+  margin-bottom: 32px;
+}
+
+.onetab-group-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.onetab-group-title {
+  font-family: 'Newsreader', serif;
+  font-weight: 400;
+  font-size: 16px;
+  font-style: italic;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.onetab-group-line {
+  flex: 1;
+  height: 1px;
+  background: var(--warm-gray);
+}
+
+.onetab-group-count {
+  font-size: 11px;
+  color: var(--muted);
+  opacity: 0.7;
+}
+
+/* ---- History item ---- */
+.onetab-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 6px;
+  transition: background 0.15s;
+  position: relative;
+}
+
+.onetab-item:hover {
+  background: rgba(200, 113, 58, 0.04);
+}
+
+.onetab-item-favicon {
+  width: 16px;
+  height: 16px;
+  flex-shrink: 0;
+  border-radius: 2px;
+}
+
+.onetab-item-content {
+  flex: 1;
+  min-width: 0;
+}
+
+.onetab-item-title {
+  font-size: 13px;
+  color: var(--ink);
+  text-decoration: none;
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  transition: color 0.15s;
+}
+
+.onetab-item-title:hover {
+  color: var(--accent-amber);
+}
+
+.onetab-item-meta {
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 2px;
+  display: flex;
+  gap: 8px;
+}
+
+.onetab-item-source {
+  font-size: 10px;
+  padding: 1px 6px;
+  border-radius: 3px;
+  font-weight: 500;
+}
+
+.onetab-item-source.save {
+  color: var(--accent-sage);
+  background: rgba(90, 122, 98, 0.08);
+}
+
+.onetab-item-source.close {
+  color: var(--muted);
+  background: rgba(154, 145, 138, 0.08);
+}
+
+.onetab-item-time {
+  font-size: 11px;
+  color: var(--muted);
+  flex-shrink: 0;
+}
+
+/* Delete button — appears on hover */
+.onetab-item-delete {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  color: var(--muted);
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 4px;
+  opacity: 0;
+  transition: opacity 0.15s, color 0.15s, background 0.15s;
+  flex-shrink: 0;
+}
+
+.onetab-item:hover .onetab-item-delete {
+  opacity: 0.4;
+}
+
+.onetab-item-delete:hover {
+  opacity: 1 !important;
+  color: var(--status-abandoned);
+  background: rgba(179, 90, 90, 0.08);
+}
+
+.onetab-item-delete svg {
+  width: 14px;
+  height: 14px;
+}
+
+/* ---- Empty state ---- */
+.onetab-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 80px 24px;
+  text-align: center;
+  animation: fadeUp 0.5s ease both;
+}
+
+.onetab-empty-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: rgba(154, 145, 138, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.onetab-empty-icon svg {
+  width: 26px;
+  height: 26px;
+  color: var(--muted);
+  stroke-width: 1.5;
+}
+
+.onetab-empty-text {
+  font-family: 'Newsreader', serif;
+  font-size: 18px;
+  font-weight: 400;
+  font-style: italic;
+  color: var(--muted);
+}
+
+/* ---- Animations ---- */
+.onetab-group {
+  animation: fadeUp 0.4s ease both;
+}
+
+.onetab-group:nth-child(1) { animation-delay: 0.05s; }
+.onetab-group:nth-child(2) { animation-delay: 0.1s; }
+.onetab-group:nth-child(3) { animation-delay: 0.15s; }
+.onetab-group:nth-child(n+4) { animation-delay: 0.2s; }

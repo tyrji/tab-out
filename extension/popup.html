@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      width: 240px;
+      padding: 16px;
+      font-family: -apple-system, BlinkMacSystemFont, 'DM Sans', sans-serif;
+      font-size: 13px;
+      color: #333;
+    }
+    .popup-count {
+      text-align: center;
+      margin-bottom: 12px;
+      color: #666;
+    }
+    .popup-count span {
+      font-size: 24px;
+      font-weight: 600;
+      color: #333;
+    }
+    .popup-btn {
+      width: 100%;
+      padding: 10px;
+      border: none;
+      border-radius: 8px;
+      background: #3d7a4a;
+      color: #fff;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .popup-btn:hover { background: #356d42; }
+    .popup-btn:disabled { background: #999; cursor: default; }
+    .popup-link {
+      display: block;
+      text-align: center;
+      margin-top: 12px;
+      color: #888;
+      font-size: 11px;
+      text-decoration: none;
+    }
+    .popup-link:hover { color: #3d7a4a; }
+  </style>
+</head>
+<body>
+  <div class="popup-count"><span id="tabCount">—</span> <span id="tabLabel">tabs</span></div>
+  <button class="popup-btn" id="saveBtn">Save all to OneTab</button>
+  <a href="onetab.html" id="viewLink" target="_blank" class="popup-link">View saved tabs</a>
+  <script src="i18n.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>
