@@ -56,8 +56,7 @@ async function addToHistory(tab) {
 
     // Prune oldest 10% when over 10000
     if (history.length > 10000) {
-      const keep = Math.floor(history.length * 0.9);
-      history.splice(0, history.length - keep);
+      history.splice(0, Math.floor(history.length * 0.1));
     }
 
     await chrome.storage.local.set({ history });
