@@ -13,6 +13,57 @@
  *   Red    (#b35a5a) → 21+ tabs   (time to cull!)
  */
 
+/**
+ * addToHistory(tab)
+ *
+ * Records a closed tab to the history list in chrome.storage.local.
+ * Silently prunes oldest 10% when total exceeds 10000 records.
+ */
+async function addToHistory(tab) {
+  if (!tab || !tab.url) return;
+
+  const url = tab.url || '';
+
+  // Skip Tab Out's own pages
+  if (url.startsWith('chrome-extension://') && url.includes(chrome.runtime.id)) return;
+
+  let domain = '';
+  try { domain = new URL(url).hostname; } catch {}
+
+  const entry = {
+    id:       Date.now().toString() + Math.random().toString(36).slice(2, 6),
+    url:      url,
+    title:    tab.title || url,
+    domain:   domain,
+    closedAt: new Date().toISOString(),
+    source:   tab.source || 'close',
+  };
+
+  try {
+    const { history = [] } = await chrome.storage.local.get('history');
+
+    // Deduplicate: skip if the same URL was recorded in the last 2 seconds
+    // (prevents double-recording when app.js writes history and then background.js
+    // also fires on chrome.tabs.remove)
+    const twoSecondsAgo = Date.now() - 2000;
+    const isDuplicate = history.some(item =>
+      item.url === url &&
+      new Date(item.closedAt).getTime() > twoSecondsAgo
+    );
+    if (isDuplicate) return;
+
+    history.push(entry);
+
+    // Prune oldest 10% when over 10000
+    if (history.length > 10000) {
+      const keep = Math.floor(history.length * 0.9);
+      history.splice(0, history.length - keep);
+    }
+
+    await chrome.storage.local.set({ history });
+  } catch {}
+}
+
 // ─── Badge updater ────────────────────────────────────────────────────────────
 
 /**
@@ -78,13 +129,24 @@ chrome.tabs.onCreated.addListener(() => {
 });
 
 // Update badge whenever a tab is closed
-chrome.tabs.onRemoved.addListener(() => {
+// Also record tab to history using cached info
+const tabCache = new Map();
+
+chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
   updateBadge();
+  if (changeInfo.status === 'complete' || tab.url) {
+    tabCache.set(tabId, { url: tab.url, title: tab.title });
+  }
 });
 
-// Update badge when a tab's URL changes (e.g. navigating to/from chrome://)
-chrome.tabs.onUpdated.addListener(() => {
+chrome.tabs.onRemoved.addListener(async (tabId) => {
   updateBadge();
+  const info = tabCache.get(tabId);
+  if (info) {
+    tabCache.delete(tabId);
+    info.source = 'close';
+    await addToHistory(info);
+  }
 });
 
 // ─── Initial run ─────────────────────────────────────────────────────────────

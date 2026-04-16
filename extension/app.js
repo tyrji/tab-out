@@ -65,16 +65,16 @@ async function fetchOpenTabs() {
 async function closeTabsByUrls(urls) {
   if (!urls || urls.length === 0) return;
 
-  // Separate file:// URLs (exact match) from regular URLs (hostname match)
+  // Separate file:// and browser-internal URLs (exact match) from regular URLs (hostname match)
   const targetHostnames = [];
   const exactUrls = new Set();
 
   for (const u of urls) {
-    if (u.startsWith('file://')) {
+    if (u.startsWith('file://') || u.startsWith('chrome://') || u.startsWith('chrome-extension://') || u.startsWith('about:')) {
       exactUrls.add(u);
     } else {
       try { targetHostnames.push(new URL(u).hostname); }
-      catch { /* skip unparseable */ }
+      catch { exactUrls.add(u); /* unparseable, try exact */ }
     }
   }
 
@@ -82,15 +82,17 @@ async function closeTabsByUrls(urls) {
   const toClose = allTabs
     .filter(tab => {
       const tabUrl = tab.url || '';
-      if (tabUrl.startsWith('file://') && exactUrls.has(tabUrl)) return true;
+      if (exactUrls.has(tabUrl)) return true;
       try {
         const tabHostname = new URL(tabUrl).hostname;
         return tabHostname && targetHostnames.includes(tabHostname);
       } catch { return false; }
-    })
-    .map(tab => tab.id);
+    });
 
-  if (toClose.length > 0) await chrome.tabs.remove(toClose);
+  // Record to history before closing
+  await recordHistory(toClose);
+
+  if (toClose.length > 0) await chrome.tabs.remove(toClose.map(t => t.id));
   await fetchOpenTabs();
 }
 
@@ -104,8 +106,10 @@ async function closeTabsExact(urls) {
   if (!urls || urls.length === 0) return;
   const urlSet = new Set(urls);
   const allTabs = await chrome.tabs.query({});
-  const toClose = allTabs.filter(t => urlSet.has(t.url)).map(t => t.id);
-  if (toClose.length > 0) await chrome.tabs.remove(toClose);
+  const toClose = allTabs.filter(t => urlSet.has(t.url));
+  // Record to history before closing
+  await recordHistory(toClose);
+  if (toClose.length > 0) await chrome.tabs.remove(toClose.map(t => t.id));
   await fetchOpenTabs();
 }
 
@@ -164,6 +168,10 @@ async function closeDuplicateTabs(urls, keepOne = true) {
       for (const tab of matching) toClose.push(tab.id);
     }
   }
+
+  // Record to history before closing
+  const toCloseTabs = allTabs.filter(t => toClose.includes(t.id));
+  await recordHistory(toCloseTabs);
 
   if (toClose.length > 0) await chrome.tabs.remove(toClose);
   await fetchOpenTabs();
@@ -236,6 +244,9 @@ async function saveTabForLater(tab) {
     dismissed: false,
   });
   await chrome.storage.local.set({ deferred });
+
+  // Also record to history
+  await recordHistory([{ ...tab, source: 'save' }]);
 }
 
 /**
@@ -283,6 +294,38 @@ async function dismissSavedTab(id) {
   }
 }
 
+
+/* ----------------------------------------------------------------
+   HISTORY — Record closed tabs
+   ---------------------------------------------------------------- */
+
+async function recordHistory(tabs, source = 'close') {
+  if (!tabs || tabs.length === 0) return;
+  try {
+    const { history = [] } = await chrome.storage.local.get('history');
+    for (const tab of tabs) {
+      if (!tab || !tab.url) continue;
+      const url = tab.url;
+      // Skip Tab Out's own pages
+      if (url.startsWith('chrome-extension://') && url.includes(chrome.runtime.id)) continue;
+      let domain = '';
+      try { domain = new URL(url).hostname; } catch {}
+      history.push({
+        id:       Date.now().toString() + Math.random().toString(36).slice(2, 6),
+        url:      url,
+        title:    tab.title || url,
+        domain:   domain,
+        closedAt: new Date().toISOString(),
+        source:   tab.source || source,
+      });
+    }
+    // Prune oldest 10% when over 10000
+    if (history.length > 10000) {
+      history.splice(0, Math.floor(history.length * 0.1));
+    }
+    await chrome.storage.local.set({ history });
+  } catch {}
+}
 
 /* ----------------------------------------------------------------
    UI HELPERS
@@ -713,22 +756,31 @@ let domainGroups = [];
    HELPER: filter out browser-internal pages
    ---------------------------------------------------------------- */
 
+function isBrowserInternal(url) {
+  const u = url || '';
+  return u.startsWith('chrome://') ||
+         u.startsWith('chrome-extension://') ||
+         u.startsWith('about:') ||
+         u.startsWith('edge://') ||
+         u.startsWith('brave://');
+}
+
 /**
  * getRealTabs()
  *
- * Returns tabs that are real web pages — no chrome://, extension
- * pages, about:blank, etc.
+ * Returns all non-Tab-Out-own tabs.
+ * Browser-internal pages (chrome:// etc.) are included
+ * so they can be displayed as a "Browser" group.
  */
 function getRealTabs() {
+  const extensionId = chrome.runtime.id;
+  const newtabUrl = `chrome-extension://${extensionId}/index.html`;
   return openTabs.filter(t => {
     const url = t.url || '';
-    return (
-      !url.startsWith('chrome://') &&
-      !url.startsWith('chrome-extension://') &&
-      !url.startsWith('about:') &&
-      !url.startsWith('edge://') &&
-      !url.startsWith('brave://')
-    );
+    // Only filter out Tab Out's own pages and blank new tabs
+    if (t.isTabOut) return false;
+    if (url === 'chrome://newtab/') return false;
+    return true;
   });
 }
 
@@ -1089,6 +1141,13 @@ async function renderStaticDashboard() {
 
   for (const tab of realTabs) {
     try {
+      // Browser-internal pages (chrome://, about:, etc.) go to their own group
+      if (isBrowserInternal(tab.url)) {
+        if (!groupMap['__browser__']) groupMap['__browser__'] = { domain: '__browser__', label: t('section.browser'), tabs: [] };
+        groupMap['__browser__'].tabs.push(tab);
+        continue;
+      }
+
       if (isLandingPage(tab.url)) {
         landingTabs.push(tab);
         continue;
@@ -1135,6 +1194,11 @@ async function renderStaticDashboard() {
     const bIsLanding = b.domain === '__landing-pages__';
     if (aIsLanding !== bIsLanding) return aIsLanding ? -1 : 1;
 
+    // Browser group always goes last
+    const aIsBrowser = a.domain === '__browser__';
+    const bIsBrowser = b.domain === '__browser__';
+    if (aIsBrowser !== bIsBrowser) return aIsBrowser ? 1 : -1;
+
     const aIsPriority = isLandingDomain(a.domain);
     const bIsPriority = isLandingDomain(b.domain);
     if (aIsPriority !== bIsPriority) return aIsPriority ? -1 : 1;
@@ -1158,8 +1222,9 @@ async function renderStaticDashboard() {
   }
 
   // --- Footer stats ---
+  const realTabsCount = getRealTabs().length;
   const statTabs = document.getElementById('statTabs');
-  if (statTabs) statTabs.textContent = openTabs.length;
+  if (statTabs) statTabs.textContent = realTabsCount;
   const statTabsLabel = document.getElementById('statTabsLabel');
   if (statTabsLabel) statTabsLabel.textContent = t('footer.openTabs');
 
@@ -1168,6 +1233,10 @@ async function renderStaticDashboard() {
 
   // --- Render "Saved for Later" column ---
   await renderDeferredColumn();
+
+  // --- Update History link text for i18n ---
+  const historyLink = document.getElementById('historyLink');
+  if (historyLink) historyLink.textContent = t('section.history');
 }
 
 async function renderDashboard() {
@@ -1240,10 +1309,13 @@ document.addEventListener('click', async (e) => {
     const tabUrl = actionEl.dataset.tabUrl;
     if (!tabUrl) return;
 
-    // Close the tab in Chrome directly
+    // Record to history before closing
     const allTabs = await chrome.tabs.query({});
     const match   = allTabs.find(t => t.url === tabUrl);
-    if (match) await chrome.tabs.remove(match.id);
+    if (match) {
+      await recordHistory([match]);
+      await chrome.tabs.remove(match.id);
+    }
     await fetchOpenTabs();
 
     playCloseSound();
@@ -1271,7 +1343,7 @@ document.addEventListener('click', async (e) => {
 
     // Update footer
     const statTabs = document.getElementById('statTabs');
-    if (statTabs) statTabs.textContent = openTabs.length;
+    if (statTabs) statTabs.textContent = getRealTabs().length;
 
     showToast(t('toast.tabClosed'));
     return;
@@ -1385,7 +1457,7 @@ document.addEventListener('click', async (e) => {
     showToast(t('toast.closedFrom', urls.length, groupLabel));
 
     const statTabs = document.getElementById('statTabs');
-    if (statTabs) statTabs.textContent = openTabs.length;
+    if (statTabs) statTabs.textContent = getRealTabs().length;
     return;
   }
 
@@ -1425,9 +1497,8 @@ document.addEventListener('click', async (e) => {
 
   // ---- Close ALL open tabs ----
   if (action === 'close-all-open-tabs') {
-    const allUrls = openTabs
-      .filter(t => t.url && !t.url.startsWith('chrome') && !t.url.startsWith('about:'))
-      .map(t => t.url);
+    const realTabs = getRealTabs();
+    const allUrls = realTabs.map(t => t.url).filter(Boolean);
     await closeTabsByUrls(allUrls);
     playCloseSound();
 
@@ -1494,6 +1565,7 @@ document.addEventListener('click', async (e) => {
 
   const newLang = getLang() === 'zh' ? 'en' : 'zh';
   await setLang(newLang);
+  document.body.classList.toggle('lang-zh', newLang === 'zh');
   btn.textContent = newLang === 'zh' ? '中/EN' : 'EN/中';
   await renderDashboard();
 });
@@ -1530,6 +1602,7 @@ document.addEventListener('visibilitychange', () => {
   await loadLang();
   const langToggle = document.getElementById('langToggle');
   if (langToggle) langToggle.textContent = getLang() === 'zh' ? '中/EN' : 'EN/中';
+  document.body.classList.toggle('lang-zh', getLang() === 'zh');
 })();
 
 renderDashboard();

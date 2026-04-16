@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tab Out — History</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,300;0,6..72,400;0,6..72,500;1,6..72,300;1,6..72,400&family=DM+Sans:wght@300;400;500;600&family=Noto+Sans+SC:wght@300;400;500&family=Noto+Serif+SC:wght@300;400&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="history.css">
+</head>
+<body>
+<div class="container">
+
+  <header>
+    <div class="header-left">
+      <div class="header-back">
+        <a href="index.html" id="backLink" class="back-link"></a>
+      </div>
+      <div>
+        <h1 id="historyTitle"></h1>
+        <div class="date" id="historySubtitle"></div>
+      </div>
+    </div>
+    <div class="header-right">
+      <input type="text" class="history-search" id="historySearch" placeholder="">
+    </div>
+  </header>
+
+  <div class="history-groups" id="historyGroups"></div>
+
+  <div class="history-empty" id="historyEmpty" style="display:none"></div>
+
+  <footer>
+    <div class="footer-stats">
+      <div class="stat">
+        <div class="stat-num" id="statHistoryCount">—</div>
+        <div class="stat-label" id="statHistoryLabel"></div>
+      </div>
+    </div>
+    <div class="last-refresh">
+      <button id="langToggle" style="background:none;border:1px solid var(--border);border-radius:4px;cursor:pointer;color:var(--muted);font-size:11px;padding:2px 8px;font-family:inherit">中/EN</button>
+      <button id="clearHistoryBtn" class="action-btn danger" style="font-size:11px;"></button>
+    </div>
+  </footer>
+
+</div>
+
+<div class="toast" id="toast">
+  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
+  </svg>
+  <span id="toastText"></span>
+</div>
+
+<script src="config.local.js" onerror="/* no personal config */"></script>
+<script src="i18n.js"></script>
+<script src="history.js"></script>
+</body>
+</html>

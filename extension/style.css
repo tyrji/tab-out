@@ -30,6 +30,20 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
+/* Chinese locale: use Noto Sans SC / Noto Serif SC */
+body.lang-zh {
+  font-family: 'Noto Sans SC', 'DM Sans', sans-serif;
+}
+body.lang-zh .section-header h2,
+body.lang-zh .header-left h1,
+body.lang-zh .mission-page-count,
+body.lang-zh .stat-num,
+body.lang-zh .empty-title,
+body.lang-zh .history-group-title,
+body.lang-zh .history-empty-text {
+  font-family: 'Noto Serif SC', 'Newsreader', serif;
+}
+
 /* Subtle paper texture */
 body::before {
   content: '';
@@ -637,6 +651,9 @@ footer {
 .last-refresh {
   font-size: 11px;
   color: var(--muted);
+  display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
 .refresh-btn {

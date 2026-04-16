@@ -21,6 +21,8 @@ const translations = {
     'section.savedLater': '稍后查看',
     'section.homepages': '主页',
     'section.archive':   '归档',
+    'section.history':   'History',
+    'section.browser':   '浏览器',
 
     // Footer
     'footer.openTabs': '打开的标签页',
@@ -66,6 +68,23 @@ const translations = {
     'empty.saved':     '没有保存的内容，活在当下。',
     'empty.archive':   '无结果',
 
+    // History page
+    'history.title':       'History',
+    'history.search':      '搜索历史记录...',
+    'history.today':       '今天',
+    'history.yesterday':   '昨天',
+    'history.thisWeek':    '本周',
+    'history.monthFormat': (year, month) => `${year}年${month}月`,
+    'history.dateFormat':  (month, day) => `${month}月${day}日`,
+    'history.clearAll':    '清空所有历史',
+    'history.total':       (n) => `共 ${n} 条记录`,
+    'history.empty':       '暂无历史记录。',
+    'history.confirmClear': '确定清空所有历史记录？',
+    'history.restored':    '已在新标签页打开',
+    'history.deleted':     '已删除',
+    'history.cleared':     '历史记录已清空',
+    'history.back':        '← 返回',
+
     // Search
     'search.archive':  '搜索归档标签页...',
 
@@ -87,6 +106,8 @@ const translations = {
     'section.savedLater': 'Saved for later',
     'section.homepages':  'Homepages',
     'section.archive':    'Archive',
+    'section.history':    'History',
+    'section.browser':    'Browser',
 
     // Footer
     'footer.openTabs': 'Open tabs',
@@ -131,6 +152,23 @@ const translations = {
     // Empty states
     'empty.saved':     'Nothing saved. Living in the moment.',
     'empty.archive':   'No results',
+
+    // History page
+    'history.title':       'History',
+    'history.search':      'Search history...',
+    'history.today':       'Today',
+    'history.yesterday':   'Yesterday',
+    'history.thisWeek':    'This week',
+    'history.monthFormat': (year, month) => `${year} ${month}`,
+    'history.dateFormat':  (month, day) => `${month} ${day}`,
+    'history.clearAll':    'Clear all history',
+    'history.total':       (n) => `${n} record${n !== 1 ? 's' : ''}`,
+    'history.empty':       'No history yet.',
+    'history.confirmClear': 'Clear all history records?',
+    'history.restored':    'Opened in new tab',
+    'history.deleted':     'Deleted',
+    'history.cleared':     'History cleared',
+    'history.back':        '← Back',
 
     // Search
     'search.archive':  'Search archived tabs...',
