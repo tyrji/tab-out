@@ -18,9 +18,7 @@ const translations = {
 
     // Section headers
     'section.openTabs':  '打开的标签页',
-    'section.savedLater': '稍后查看',
     'section.homepages': '主页',
-    'section.archive':   '归档',
     'section.history':   'History',
     'section.oneTab':    'OneTab',
     'section.browser':   '浏览器',
@@ -38,7 +36,6 @@ const translations = {
     // Tab counts
     'label.tabs':    '个标签页',
     'label.domains': '个域名',
-    'label.item':    '项',
 
     // Actions
     'action.closeAll':     (n) => `关闭全部 ${n} 个标签页`,
@@ -63,8 +60,6 @@ const translations = {
     // Toast messages
     'toast.closedExtra':    '已关闭多余的 Tab Out 标签页',
     'toast.tabClosed':      '标签页已关闭',
-    'toast.saveFailed':     '保存失败',
-    'toast.saved':          '已保存到稍后查看',
     'toast.closedFrom':     (n, label) => `已关闭来自 ${label} 的 ${n} 个标签页`,
     'toast.closedDupes':    '已关闭重复项，每个保留一份',
     'toast.allClosed':      '全部标签页已关闭，焕然一新',
@@ -73,8 +68,6 @@ const translations = {
     'banner.dupeText':  (n) => `你有 ${n} 个 Tab Out 标签页打开。只保留这一个？`,
 
     // Empty states
-    'empty.saved':           '没有保存的内容，活在当下。',
-    'empty.archive':         '无结果',
     'empty.inboxZeroTitle':   '标签页清零，收工。',
     'empty.inboxZeroSubtitle':'自由了。',
 
@@ -111,9 +104,6 @@ const translations = {
     'onetab.cleared':      '已清空',
     'onetab.back':         '← 返回',
 
-    // Search
-    'search.archive':  '搜索归档标签页...',
-
     // Overflow
     'overflow.more':   (n) => `+${n} 更多`,
   },
@@ -129,9 +119,7 @@ const translations = {
 
     // Section headers
     'section.openTabs':   'Open tabs',
-    'section.savedLater': 'Saved for later',
     'section.homepages':  'Homepages',
-    'section.archive':    'Archive',
     'section.history':    'History',
     'section.oneTab':     'OneTab',
     'section.browser':    'Browser',
@@ -149,7 +137,6 @@ const translations = {
     // Tab counts
     'label.tabs':    (n) => n === 1 ? 'tab' : 'tabs',
     'label.domains': (n) => n === 1 ? 'domain' : 'domains',
-    'label.item':    (n) => n === 1 ? 'item' : 'items',
 
     // Actions
     'action.closeAll':     (n) => `Close all ${n} tab${n !== 1 ? 's' : ''}`,
@@ -174,8 +161,6 @@ const translations = {
     // Toast messages
     'toast.closedExtra':    'Closed extra Tab Out tabs',
     'toast.tabClosed':      'Tab closed',
-    'toast.saveFailed':     'Failed to save tab',
-    'toast.saved':          'Saved for later',
     'toast.closedFrom':     (n, label) => `Closed ${n} tab${n !== 1 ? 's' : ''} from ${label}`,
     'toast.closedDupes':    'Closed duplicates, kept one copy each',
     'toast.allClosed':      'All tabs closed. Fresh start.',
@@ -184,8 +169,6 @@ const translations = {
     'banner.dupeText':  (n) => `You have ${n} Tab Out tabs open. Keep just this one?`,
 
     // Empty states
-    'empty.saved':           'Nothing saved. Living in the moment.',
-    'empty.archive':         'No results',
     'empty.inboxZeroTitle':   'Inbox zero, but for tabs.',
     'empty.inboxZeroSubtitle':"You're free.",
 
@@ -221,9 +204,6 @@ const translations = {
     'onetab.deleted':      'Deleted',
     'onetab.cleared':      'Cleared',
     'onetab.back':         '← Back',
-
-    // Search
-    'search.archive':  'Search archived tabs...',
 
     // Overflow
     'overflow.more':   (n) => `+${n} more`,
