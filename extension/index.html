@@ -39,11 +39,10 @@
           <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 0 1-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 0 1 1.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 0 0-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125v3.5m7.5 10.375H9.375a1.125 1.125 0 0 1-1.125-1.125v-9.25m12 6.625v-1.875a3.375 3.375 0 0 0-3.375-3.375h-1.5a1.125 1.125 0 0 1-1.125-1.125v-1.5a3.375 3.375 0 0 0-3.375-3.375H9.75" />
         </svg>
       </div>
-      <div class="tab-cleanup-text">
-        You have <strong id="tabOutDupeCount"></strong> Tab Out tabs open. Keep just this one?
+      <div class="tab-cleanup-text" id="tabOutDupeText">
       </div>
     </div>
-    <button class="tab-cleanup-btn" data-action="close-tabout-dupes">Close extras</button>
+    <button class="tab-cleanup-btn" data-action="close-tabout-dupes" id="tabOutDupeBtn">Close extras</button>
   </div>
 
   <!-- ================================================================
@@ -58,6 +57,9 @@
     <div class="active-section" id="openTabsSection" style="display:none">
       <div class="section-header">
         <h2 id="openTabsSectionTitle">Right now</h2>
+        <button id="refreshBtn" title="Refresh" style="background:none;border:none;cursor:pointer;color:var(--muted);padding:0 0 0 8px;display:inline-flex;align-items:center;transform-origin:center">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="14" height="14"><path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.992 0 3.181 3.183a8.25 8.25 0 0 0 13.803-3.7M4.031 9.865a8.25 8.25 0 0 1 13.803-3.7l3.181 3.182" /></svg>
+        </button>
         <div class="section-line"></div>
         <div class="section-count" id="openTabsSectionCount"></div>
       </div>
@@ -67,7 +69,7 @@
     <!-- RIGHT COLUMN: Saved for Later checklist -->
     <div class="deferred-column" id="deferredColumn" style="display:none">
       <div class="section-header">
-        <h2>Saved for later</h2>
+        <h2 id="savedLaterTitle">Saved for later</h2>
         <div class="section-line"></div>
         <div class="section-count" id="deferredCount"></div>
       </div>
@@ -84,7 +86,7 @@
       <div class="deferred-archive" id="deferredArchive" style="display:none">
         <button class="archive-toggle" id="archiveToggle">
           <svg class="archive-chevron" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="m19.5 8.25-7.5 7.5-7.5-7.5" /></svg>
-          Archive
+          <span id="archiveLabel">Archive</span>
           <span class="archive-count" id="archiveCount"></span>
         </button>
         <div class="archive-body" id="archiveBody" style="display:none">
@@ -103,10 +105,11 @@
     <div class="footer-stats">
       <div class="stat">
         <div class="stat-num" id="statTabs">—</div>
-        <div class="stat-label">Open tabs</div>
+        <div class="stat-label" id="statTabsLabel">Open tabs</div>
       </div>
     </div>
     <div class="last-refresh">
+      <button id="langToggle" style="background:none;border:1px solid var(--border);border-radius:4px;cursor:pointer;color:var(--muted);font-size:11px;padding:2px 8px;font-family:inherit">中/EN</button>
       <span style="color: var(--muted); font-size: 11px;"><a href="https://github.com/zarazhangrui/tab-out" target="_top" style="color: var(--muted); text-decoration: underline; text-underline-offset: 2px;">Tab Out</a> by <a href="https://x.com/zarazhangrui" target="_top" style="color: var(--muted); text-decoration: underline; text-underline-offset: 2px;">Zara</a></span>
     </div>
   </footer>
@@ -128,6 +131,9 @@
 <!-- Personal config (gitignored) — defines LOCAL_LANDING_PAGE_PATTERNS etc. -->
 <!-- If the file doesn't exist, that's fine — app.js uses sensible defaults. -->
 <script src="config.local.js" onerror="/* no personal config, that's fine */"></script>
+
+<!-- i18n translations (loaded before app.js) -->
+<script src="i18n.js"></script>
 
 <!-- Main dashboard logic — loads last so the DOM is ready -->
 <script src="app.js"></script>

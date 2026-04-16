@@ -484,11 +484,11 @@ function timeAgo(dateStr) {
   const diffHours = Math.floor((now - then) / 3600000);
   const diffDays  = Math.floor((now - then) / 86400000);
 
-  if (diffMins < 1)   return 'just now';
-  if (diffMins < 60)  return diffMins + ' min ago';
-  if (diffHours < 24) return diffHours + ' hr' + (diffHours !== 1 ? 's' : '') + ' ago';
-  if (diffDays === 1) return 'yesterday';
-  return diffDays + ' days ago';
+  if (diffMins < 1)   return t('time.justNow');
+  if (diffMins < 60)  return t('time.minutesAgo', diffMins);
+  if (diffHours < 24) return t('time.hoursAgo', diffHours);
+  if (diffDays === 1) return t('time.yesterday');
+  return t('time.daysAgo', diffDays);
 }
 
 /**
@@ -496,16 +496,16 @@ function timeAgo(dateStr) {
  */
 function getGreeting() {
   const hour = new Date().getHours();
-  if (hour < 12) return 'Good morning';
-  if (hour < 17) return 'Good afternoon';
-  return 'Good evening';
+  if (hour < 12) return t('greeting.morning');
+  if (hour < 17) return t('greeting.afternoon');
+  return t('greeting.evening');
 }
 
 /**
  * getDateDisplay() — "Friday, April 4, 2026"
  */
 function getDateDisplay() {
-  return new Date().toLocaleDateString('en-US', {
+  return new Date().toLocaleDateString(t('date.locale'), {
     weekday: 'long',
     year:    'numeric',
     month:   'long',
@@ -741,11 +741,11 @@ function getRealTabs() {
 function checkTabOutDupes() {
   const tabOutTabs = openTabs.filter(t => t.isTabOut);
   const banner  = document.getElementById('tabOutDupeBanner');
-  const countEl = document.getElementById('tabOutDupeCount');
   if (!banner) return;
 
   if (tabOutTabs.length > 1) {
-    if (countEl) countEl.textContent = tabOutTabs.length;
+    const textEl = document.getElementById('tabOutDupeText');
+    if (textEl) textEl.innerHTML = t('banner.dupeText', tabOutTabs.length);
     banner.style.display = 'flex';
   } else {
     banner.style.display = 'none';
@@ -772,10 +772,10 @@ function buildOverflowChips(hiddenTabs, urlCounts = {}) {
       ${faviconUrl ? `<img class="chip-favicon" src="${faviconUrl}" alt="" onerror="this.style.display='none'">` : ''}
       <span class="chip-text">${label}</span>${dupeTag}
       <div class="chip-actions">
-        <button class="chip-action chip-save" data-action="defer-single-tab" data-tab-url="${safeUrl}" data-tab-title="${safeTitle}" title="Save for later">
+        <button class="chip-action chip-save" data-action="defer-single-tab" data-tab-url="${safeUrl}" data-tab-title="${safeTitle}" title="${t('action.save')}">
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z" /></svg>
         </button>
-        <button class="chip-action chip-close" data-action="close-single-tab" data-tab-url="${safeUrl}" title="Close this tab">
+        <button class="chip-action chip-close" data-action="close-single-tab" data-tab-url="${safeUrl}" title="${t('action.closeTab')}">
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" /></svg>
         </button>
       </div>
@@ -785,7 +785,7 @@ function buildOverflowChips(hiddenTabs, urlCounts = {}) {
   return `
     <div class="page-chips-overflow" style="display:none">${hiddenChips}</div>
     <div class="page-chip page-chip-overflow clickable" data-action="expand-chips">
-      <span class="chip-text">+${hiddenTabs.length} more</span>
+      <span class="chip-text">${t('overflow.more', hiddenTabs.length)}</span>
     </div>`;
 }
 
@@ -815,12 +815,12 @@ function renderDomainCard(group) {
 
   const tabBadge = `<span class="open-tabs-badge">
     ${ICONS.tabs}
-    ${tabCount} tab${tabCount !== 1 ? 's' : ''} open
+    ${tabCount} ${t('label.tabs', tabCount)}
   </span>`;
 
   const dupeBadge = hasDupes
-    ? `<span class="open-tabs-badge" style="color:var(--accent-amber);background:rgba(200,113,58,0.08);">
-        ${totalExtras} duplicate${totalExtras !== 1 ? 's' : ''}
+    ? `<span class="open-tabs-badge" data-dupe-badge style="color:var(--accent-amber);background:rgba(200,113,58,0.08);">
+        ${t('action.closeDupes', totalExtras)}
       </span>`
     : '';
 
@@ -853,10 +853,10 @@ function renderDomainCard(group) {
       ${faviconUrl ? `<img class="chip-favicon" src="${faviconUrl}" alt="" onerror="this.style.display='none'">` : ''}
       <span class="chip-text">${label}</span>${dupeTag}
       <div class="chip-actions">
-        <button class="chip-action chip-save" data-action="defer-single-tab" data-tab-url="${safeUrl}" data-tab-title="${safeTitle}" title="Save for later">
+        <button class="chip-action chip-save" data-action="defer-single-tab" data-tab-url="${safeUrl}" data-tab-title="${safeTitle}" title="${t('action.save')}">
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0 1 11.186 0Z" /></svg>
         </button>
-        <button class="chip-action chip-close" data-action="close-single-tab" data-tab-url="${safeUrl}" title="Close this tab">
+        <button class="chip-action chip-close" data-action="close-single-tab" data-tab-url="${safeUrl}" title="${t('action.closeTab')}">
           <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" /></svg>
         </button>
       </div>
@@ -866,14 +866,14 @@ function renderDomainCard(group) {
   let actionsHtml = `
     <button class="action-btn close-tabs" data-action="close-domain-tabs" data-domain-id="${stableId}">
       ${ICONS.close}
-      Close all ${tabCount} tab${tabCount !== 1 ? 's' : ''}
+      ${t('action.closeDomain', tabCount)}
     </button>`;
 
   if (hasDupes) {
     const dupeUrlsEncoded = dupeUrls.map(([url]) => encodeURIComponent(url)).join(',');
     actionsHtml += `
       <button class="action-btn" data-action="dedup-keep-one" data-dupe-urls="${dupeUrlsEncoded}">
-        Close ${totalExtras} duplicate${totalExtras !== 1 ? 's' : ''}
+        ${t('action.closeDupes', totalExtras)}
       </button>`;
   }
 
@@ -882,7 +882,7 @@ function renderDomainCard(group) {
       <div class="status-bar"></div>
       <div class="mission-content">
         <div class="mission-top">
-          <span class="mission-name">${isLanding ? 'Homepages' : (group.label || friendlyDomain(group.domain))}</span>
+          <span class="mission-name">${isLanding ? t('section.homepages') : (group.label || friendlyDomain(group.domain))}</span>
           ${tabBadge}
           ${dupeBadge}
         </div>
@@ -891,7 +891,7 @@ function renderDomainCard(group) {
       </div>
       <div class="mission-meta">
         <div class="mission-page-count">${tabCount}</div>
-        <div class="mission-page-label">tabs</div>
+        <div class="mission-page-label">${t('label.tabs', tabCount)}</div>
       </div>
     </div>`;
 }
@@ -932,7 +932,7 @@ async function renderDeferredColumn() {
 
     // Render active checklist items
     if (active.length > 0) {
-      countEl.textContent = `${active.length} item${active.length !== 1 ? 's' : ''}`;
+      countEl.textContent = `${active.length} ${t('label.item', active.length)}`;
       list.innerHTML = active.map(item => renderDeferredItem(item)).join('');
       list.style.display = 'block';
       empty.style.display = 'none';
@@ -1149,8 +1149,8 @@ async function renderStaticDashboard() {
   const openTabsSectionTitle = document.getElementById('openTabsSectionTitle');
 
   if (domainGroups.length > 0 && openTabsSection) {
-    if (openTabsSectionTitle) openTabsSectionTitle.textContent = 'Open tabs';
-    openTabsSectionCount.innerHTML = `${domainGroups.length} domain${domainGroups.length !== 1 ? 's' : ''} &nbsp;&middot;&nbsp; <button class="action-btn close-tabs" data-action="close-all-open-tabs" style="font-size:11px;padding:3px 10px;">${ICONS.close} Close all ${realTabs.length} tabs</button>`;
+    if (openTabsSectionTitle) openTabsSectionTitle.textContent = t('section.openTabs');
+    openTabsSectionCount.innerHTML = `${domainGroups.length} ${t('label.domains', domainGroups.length)} &nbsp;&middot;&nbsp; <button class="action-btn close-tabs" data-action="close-all-open-tabs" style="font-size:11px;padding:3px 10px;">${ICONS.close} ${t('action.closeAll', realTabs.length)}</button>`;
     openTabsMissionsEl.innerHTML = domainGroups.map(g => renderDomainCard(g)).join('');
     openTabsSection.style.display = 'block';
   } else if (openTabsSection) {
@@ -1160,6 +1160,8 @@ async function renderStaticDashboard() {
   // --- Footer stats ---
   const statTabs = document.getElementById('statTabs');
   if (statTabs) statTabs.textContent = openTabs.length;
+  const statTabsLabel = document.getElementById('statTabsLabel');
+  if (statTabsLabel) statTabsLabel.textContent = t('footer.openTabs');
 
   // --- Check for duplicate Tab Out tabs ---
   checkTabOutDupes();
@@ -1169,6 +1171,17 @@ async function renderStaticDashboard() {
 }
 
 async function renderDashboard() {
+  // Update static i18n elements in HTML
+  const savedLaterTitle = document.getElementById('savedLaterTitle');
+  if (savedLaterTitle) savedLaterTitle.textContent = t('section.savedLater');
+  const deferredEmpty = document.getElementById('deferredEmpty');
+  if (deferredEmpty) deferredEmpty.textContent = t('empty.saved');
+  const archiveLabel = document.getElementById('archiveLabel');
+  if (archiveLabel) archiveLabel.textContent = t('section.archive');
+  const archiveSearch = document.getElementById('archiveSearch');
+  if (archiveSearch) archiveSearch.placeholder = t('search.archive');
+  const tabOutDupeBtn = document.getElementById('tabOutDupeBtn');
+  if (tabOutDupeBtn) tabOutDupeBtn.textContent = t('action.closeExtras');
   await renderStaticDashboard();
 }
 
@@ -1198,7 +1211,7 @@ document.addEventListener('click', async (e) => {
       banner.style.opacity = '0';
       setTimeout(() => { banner.style.display = 'none'; banner.style.opacity = '1'; }, 400);
     }
-    showToast('Closed extra Tab Out tabs');
+    showToast(t('toast.closedExtra'));
     return;
   }
 
@@ -1260,7 +1273,7 @@ document.addEventListener('click', async (e) => {
     const statTabs = document.getElementById('statTabs');
     if (statTabs) statTabs.textContent = openTabs.length;
 
-    showToast('Tab closed');
+    showToast(t('toast.tabClosed'));
     return;
   }
 
@@ -1276,7 +1289,7 @@ document.addEventListener('click', async (e) => {
       await saveTabForLater({ url: tabUrl, title: tabTitle });
     } catch (err) {
       console.error('[tab-out] Failed to save tab:', err);
-      showToast('Failed to save tab');
+      showToast(t('toast.saveFailed'));
       return;
     }
 
@@ -1295,7 +1308,7 @@ document.addEventListener('click', async (e) => {
       setTimeout(() => chip.remove(), 200);
     }
 
-    showToast('Saved for later');
+    showToast(t('toast.saved'));
     await renderDeferredColumn();
     return;
   }
@@ -1368,8 +1381,8 @@ document.addEventListener('click', async (e) => {
     const idx = domainGroups.indexOf(group);
     if (idx !== -1) domainGroups.splice(idx, 1);
 
-    const groupLabel = group.domain === '__landing-pages__' ? 'Homepages' : (group.label || friendlyDomain(group.domain));
-    showToast(`Closed ${urls.length} tab${urls.length !== 1 ? 's' : ''} from ${groupLabel}`);
+    const groupLabel = group.domain === '__landing-pages__' ? t('section.homepages') : (group.label || friendlyDomain(group.domain));
+    showToast(t('toast.closedFrom', urls.length, groupLabel));
 
     const statTabs = document.getElementById('statTabs');
     if (statTabs) statTabs.textContent = openTabs.length;
@@ -1397,18 +1410,16 @@ document.addEventListener('click', async (e) => {
         b.style.opacity    = '0';
         setTimeout(() => b.remove(), 200);
       });
-      card.querySelectorAll('.open-tabs-badge').forEach(badge => {
-        if (badge.textContent.includes('duplicate')) {
-          badge.style.transition = 'opacity 0.2s';
-          badge.style.opacity    = '0';
-          setTimeout(() => badge.remove(), 200);
-        }
+      card.querySelectorAll('.open-tabs-badge[data-dupe-badge]').forEach(badge => {
+        badge.style.transition = 'opacity 0.2s';
+        badge.style.opacity    = '0';
+        setTimeout(() => badge.remove(), 200);
       });
       card.classList.remove('has-amber-bar');
       card.classList.add('has-neutral-bar');
     }
 
-    showToast('Closed duplicates, kept one copy each');
+    showToast(t('toast.closedDupes'));
     return;
   }
 
@@ -1428,7 +1439,7 @@ document.addEventListener('click', async (e) => {
       animateCardOut(c);
     });
 
-    showToast('All tabs closed. Fresh start.');
+    showToast(t('toast.allClosed'));
     return;
   }
 });
@@ -1469,14 +1480,56 @@ document.addEventListener('input', async (e) => {
     );
 
     archiveList.innerHTML = results.map(item => renderArchiveItem(item)).join('')
-      || '<div style="font-size:12px;color:var(--muted);padding:8px 0">No results</div>';
+      || `<div style="font-size:12px;color:var(--muted);padding:8px 0">${t('empty.archive')}</div>`;
   } catch (err) {
     console.warn('[tab-out] Archive search failed:', err);
   }
 });
 
 
+// ---- Language toggle ----
+document.addEventListener('click', async (e) => {
+  const btn = e.target.closest('#langToggle');
+  if (!btn) return;
+
+  const newLang = getLang() === 'zh' ? 'en' : 'zh';
+  await setLang(newLang);
+  btn.textContent = newLang === 'zh' ? '中/EN' : 'EN/中';
+  await renderDashboard();
+});
+
+// ---- Refresh button ----
+document.addEventListener('click', async (e) => {
+  const btn = e.target.closest('#refreshBtn');
+  if (!btn) return;
+
+  btn.classList.remove('spin');
+  void btn.offsetWidth; // force reflow to restart animation
+  btn.classList.add('spin');
+  await renderDashboard();
+});
+
+/* ----------------------------------------------------------------
+   REAL-TIME TAB SYNC
+
+   Refreshes immediately when the user switches back to this tab.
+   ---------------------------------------------------------------- */
+
+document.addEventListener('visibilitychange', () => {
+  if (document.visibilityState === 'visible') {
+    renderDashboard();
+  }
+});
+
 /* ----------------------------------------------------------------
    INITIALIZE
    ---------------------------------------------------------------- */
+
+// Initialize language toggle text
+(async () => {
+  await loadLang();
+  const langToggle = document.getElementById('langToggle');
+  if (langToggle) langToggle.textContent = getLang() === 'zh' ? '中/EN' : 'EN/中';
+})();
+
 renderDashboard();
