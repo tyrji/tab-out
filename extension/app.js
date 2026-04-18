@@ -1191,7 +1191,7 @@ document.addEventListener('click', async (e) => {
 
 document.addEventListener('visibilitychange', () => {
   if (document.visibilityState === 'visible') {
-    renderDashboard();
+    (async () => { await loadLang(); await renderDashboard(); })();
   }
 });
 
@@ -1205,6 +1205,5 @@ document.addEventListener('visibilitychange', () => {
   const langToggle = document.getElementById('langToggle');
   if (langToggle) langToggle.textContent = getLang() === 'zh' ? '中/EN' : 'EN/中';
   document.body.classList.toggle('lang-zh', getLang() === 'zh');
+  await renderDashboard();
 })();
-
-renderDashboard();

@@ -211,7 +211,7 @@ const translations = {
 };
 
 // ---- Current language (persisted in chrome.storage.local) ----
-let _lang = 'zh';
+let _lang = 'en';
 
 /**
  * t(key, ...args)
@@ -244,9 +244,27 @@ async function setLang(lang) {
 /**
  * loadLang() — loads persisted language preference
  */
+/**
+ * Detect browser language — returns 'zh' if browser prefers Chinese, else 'en'.
+ */
+function detectLang() {
+  try {
+    const navLang = (navigator.language || '').toLowerCase();
+    if (navLang.startsWith('zh')) return 'zh';
+  } catch {}
+  return 'en';
+}
+
 async function loadLang() {
   try {
     const { lang } = await chrome.storage.local.get('lang');
-    if (lang && translations[lang]) _lang = lang;
-  } catch {}
+    if (lang && translations[lang]) {
+      _lang = lang;
+    } else {
+      // No stored preference — auto-detect from browser
+      _lang = detectLang();
+    }
+  } catch {
+    _lang = detectLang();
+  }
 }
