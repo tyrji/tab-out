@@ -3,51 +3,87 @@
 <head>
   <meta charset="UTF-8">
   <style>
+    :root {
+      --ink: #1a1613;
+      --paper: #f8f5f0;
+      --warm-gray: #e8e2da;
+      --muted: #9a918a;
+      --accent-amber: #c8713a;
+      --accent-sage: #5a7a62;
+      --card-bg: #fffdf9;
+    }
+
     * { margin: 0; padding: 0; box-sizing: border-box; }
+
     body {
       width: 240px;
-      padding: 16px;
-      font-family: -apple-system, BlinkMacSystemFont, 'DM Sans', sans-serif;
+      padding: 20px 16px;
+      font-family: 'DM Sans', -apple-system, BlinkMacSystemFont, sans-serif;
       font-size: 13px;
-      color: #333;
+      color: var(--ink);
+      background: var(--paper);
+      -webkit-font-smoothing: antialiased;
     }
+
     .popup-count {
       text-align: center;
-      margin-bottom: 12px;
-      color: #666;
+      margin-bottom: 16px;
+      color: var(--muted);
     }
-    .popup-count span {
-      font-size: 24px;
-      font-weight: 600;
-      color: #333;
+    .popup-count .count-num {
+      font-family: 'Newsreader', Georgia, serif;
+      font-size: 32px;
+      font-weight: 300;
+      color: var(--ink);
+      line-height: 1;
+      display: block;
+      margin-bottom: 4px;
     }
+    .popup-count .count-label {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--muted);
+    }
+
     .popup-btn {
       width: 100%;
       padding: 10px;
-      border: none;
-      border-radius: 8px;
-      background: #3d7a4a;
-      color: #fff;
-      font-size: 13px;
+      border: 1px solid var(--warm-gray);
+      border-radius: 6px;
+      background: var(--ink);
+      color: var(--paper);
+      font-family: inherit;
+      font-size: 12px;
       font-weight: 500;
       cursor: pointer;
-      transition: background 0.15s;
+      transition: opacity 0.2s;
+      letter-spacing: 0.2px;
     }
-    .popup-btn:hover { background: #356d42; }
-    .popup-btn:disabled { background: #999; cursor: default; }
+    .popup-btn:hover { opacity: 0.85; }
+    .popup-btn:disabled {
+      background: var(--muted);
+      cursor: default;
+      opacity: 0.5;
+    }
+
     .popup-link {
       display: block;
       text-align: center;
       margin-top: 12px;
-      color: #888;
+      color: var(--muted);
       font-size: 11px;
       text-decoration: none;
+      transition: color 0.15s;
     }
-    .popup-link:hover { color: #3d7a4a; }
+    .popup-link:hover { color: var(--accent-amber); }
   </style>
 </head>
 <body>
-  <div class="popup-count"><span id="tabCount">—</span> <span id="tabLabel">tabs</span></div>
+  <div class="popup-count">
+    <span class="count-num" id="tabCount">—</span>
+    <span class="count-label" id="tabLabel">tabs</span>
+  </div>
   <button class="popup-btn" id="saveBtn">Save all to OneTab</button>
   <a href="onetab.html" id="viewLink" target="_blank" class="popup-link">View saved tabs</a>
   <script src="i18n.js"></script>
